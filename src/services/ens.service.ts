@@ -137,7 +137,33 @@ export class ENSService {
 
       // Extract expiry information
       const expiryDate = expiry?.expiry ? Number(expiry.expiry.value) : null
-      const registrationDate = null // Not available in getExpiry return type
+      
+      // Calculate registration date from expiry date
+      // For .eth 2LD domains, we estimate registration date from expiry
+      // Note: This is an approximation - domains can be renewed, so the actual
+      // registration date may be earlier. For exact dates, we'd need to query
+      // the NameRegistered event from the ENS Base Registrar contract.
+      let registrationDate: number | null = null
+      if (expiryDate) {
+        // Check if this is a .eth 2LD domain
+        const isEth2LD = normalizedName.split('.').length === 2 && normalizedName.endsWith('.eth')
+        
+        if (isEth2LD) {
+          // Standard .eth registration period is 1 year (31536000 seconds)
+          // Calculate registration date: expiry - 1 year
+          // This works for initial registrations, but may be inaccurate for renewed domains
+          const oneYearInSeconds = 31536000
+          registrationDate = expiryDate - oneYearInSeconds
+          
+          // Ensure we don't get a negative or unreasonable date
+          // Minimum reasonable date: January 1, 2017 (ENS launch)
+          const ensLaunchDate = 1483228800 // Jan 1, 2017
+          if (registrationDate < ensLaunchDate) {
+            registrationDate = null // Invalid date, likely a renewed domain
+          }
+        }
+      }
+      
       const gracePeriodEndDate = expiry?.expiry && expiry.gracePeriod
         ? Number(expiry.expiry.value) + expiry.gracePeriod
         : null
