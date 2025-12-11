@@ -9,6 +9,7 @@ import { DomainProfile } from './DomainProfile'
 import { ContentHashDisplay } from './ContentHashDisplay'
 import { AbiRecords } from './AbiRecords'
 import { SubnamesList } from './SubnamesList'
+import { OwnershipRoles } from './OwnershipRoles'
 
 interface DomainViewProps {
   domainName: string
@@ -68,6 +69,9 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
 
         {/* Feature 1.1: Basic Domain Information */}
         <DomainBasicInfo details={details} />
+
+        {/* Ownership Roles */}
+        <OwnershipRoles details={details} />
 
         {/* Feature 1.2: Resolver Details Panel */}
         <ResolverInfo details={details} />
