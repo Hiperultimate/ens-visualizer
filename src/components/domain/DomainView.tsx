@@ -6,6 +6,9 @@ import { ErrorMessage } from '../ui/ErrorMessage'
 import { DomainBasicInfo } from './DomainBasicInfo'
 import { ResolverInfo } from './ResolverInfo'
 import { DomainProfile } from './DomainProfile'
+import { ContentHashDisplay } from './ContentHashDisplay'
+import { AbiRecords } from './AbiRecords'
+import { SubnamesList } from './SubnamesList'
 
 interface DomainViewProps {
   domainName: string
@@ -68,6 +71,15 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
 
         {/* Feature 1.2: Resolver Details Panel */}
         <ResolverInfo details={details} />
+
+        {/* Content Hash Display */}
+        <ContentHashDisplay contentHashInfo={details.contentHashInfo} domainName={details.beautifiedName} />
+
+        {/* ABI Records */}
+        <AbiRecords abiRecord={details.abiRecord} />
+
+        {/* Subnames List */}
+        <SubnamesList subnames={details.subnames} parentDomain={details.beautifiedName} />
       </div>
     </div>
   )

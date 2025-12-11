@@ -1,7 +1,8 @@
-import { getRecords, getOwner, getExpiry, getResolver, getWrapperData } from '@ensdomains/ensjs/public'
+import { getRecords, getOwner, getExpiry, getResolver, getWrapperData, getAbiRecord } from '@ensdomains/ensjs/public'
+import { getSubnames } from '@ensdomains/ensjs/subgraph'
 import { normalize } from 'viem/ens'
 import { publicClient } from '@/lib/ens-client'
-import type { DomainDetails, DomainProfile } from '@/types/ens'
+import type { DomainDetails, DomainProfile, ContentHashInfo, AbiRecord, Subname } from '@/types/ens'
 
 export class ENSService {
   static async getDomainDetails(name: string): Promise<DomainDetails> {
@@ -12,7 +13,7 @@ export class ENSService {
       // Fetch all data in parallel for optimal performance
       // Note: getRecords needs specific text/coin keys to return them
       // We fetch common text records - expand this list as needed
-      const [records, owner, expiry, resolver, wrapperData] = await Promise.all([
+      const [records, owner, expiry, resolver, wrapperData, abiRecord] = await Promise.all([
         getRecords(publicClient, {
           name: normalizedName,
           texts: [
@@ -59,6 +60,13 @@ export class ENSService {
           console.error('Error fetching wrapper data:', error)
           return null
         }),
+        getAbiRecord(publicClient, { name: normalizedName }).catch(() => {
+          // ABI records are rare, so we silently fail
+          if (import.meta.env.DEV) {
+            console.log('No ABI record found for', normalizedName)
+          }
+          return null
+        }),
       ])
 
       // Extract resolver information
@@ -93,6 +101,40 @@ export class ENSService {
         }
       }
 
+      // Extract content hash information
+      let contentHashInfo: ContentHashInfo | null = null
+      if (records?.contentHash) {
+        const protocolType = records.contentHash.protocolType as ContentHashInfo['protocolType']
+        contentHashInfo = {
+          protocolType,
+          decoded: records.contentHash.decoded || '',
+        }
+      }
+
+      // Extract ABI record
+      let abiRecordData: AbiRecord | null = null
+      if (abiRecord) {
+        try {
+          const parsedAbi = typeof abiRecord.decoded === 'string' 
+            ? JSON.parse(abiRecord.decoded) 
+            : abiRecord.decoded
+          
+          abiRecordData = {
+            contentType: abiRecord.contentType || 0,
+            decoded: typeof abiRecord.decoded === 'string' ? abiRecord.decoded : JSON.stringify(abiRecord.decoded),
+            abi: parsedAbi,
+          }
+        } catch (error) {
+          console.error('Error parsing ABI:', error)
+          // Still include the raw decoded value
+          abiRecordData = {
+            contentType: abiRecord.contentType || 0,
+            decoded: typeof abiRecord.decoded === 'string' ? abiRecord.decoded : JSON.stringify(abiRecord.decoded),
+            abi: null,
+          }
+        }
+      }
+
       // Extract expiry information
       const expiryDate = expiry?.expiry ? Number(expiry.expiry.value) : null
       const registrationDate = null // Not available in getExpiry return type
@@ -107,6 +149,35 @@ export class ENSService {
 
       // Determine if wrapped
       const isWrapped = wrapperData !== null
+
+      // Fetch subnames (from subgraph, may fail silently)
+      let subnames: Subname[] = []
+      try {
+        const subnamesData = await getSubnames(publicClient, {
+          name: normalizedName,
+          pageSize: 100,
+          allowExpired: false,
+          allowDeleted: false,
+        })
+        
+        subnames = subnamesData.map((subname) => ({
+          id: subname.id,
+          name: subname.name,
+          truncatedName: subname.truncatedName,
+          labelName: subname.labelName,
+          owner: subname.owner,
+          registrant: subname.registrant || null,
+          createdAt: subname.createdAt ? Number(subname.createdAt.value) : null,
+          registrationDate: subname.registrationDate ? Number(subname.registrationDate.value) : null,
+          expiryDate: subname.expiryDate ? Number(subname.expiryDate.value) : null,
+          resolvedAddress: subname.resolvedAddress || null,
+        }))
+      } catch (error) {
+        // Subgraph may not be available or may fail, silently continue
+        if (import.meta.env.DEV) {
+          console.log('Could not fetch subnames for', normalizedName, ':', error)
+        }
+      }
 
       return {
         name: normalizedName,
@@ -123,7 +194,10 @@ export class ENSService {
         resolverVersion: null, // Will be fetched separately if needed
         texts,
         coins,
-        contentHash: records?.contentHash?.decoded || null,
+        contentHash: records?.contentHash?.decoded || null, // Keep for backward compatibility
+        contentHashInfo,
+        abiRecord: abiRecordData,
+        subnames,
         isWrapped,
         fuses: wrapperData?.fuses ? {
           parent: wrapperData.fuses.parent as unknown as Record<string, boolean>,
