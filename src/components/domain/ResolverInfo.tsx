@@ -1,5 +1,5 @@
-import type { FC } from 'react'
 import type { DomainDetails } from '@/types/ens'
+import type { FC } from 'react'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -64,4 +64,3 @@ export const ResolverInfo: FC<ResolverInfoProps> = ({ details }) => {
     </Card>
   )
 }
-

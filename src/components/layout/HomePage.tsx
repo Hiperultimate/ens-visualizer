@@ -1,7 +1,7 @@
 'use client'
 
-import type { FC } from 'react'
 import { useRouter } from 'next/navigation'
+import type { FC } from 'react'
 import { useState } from 'react'
 
 export const HomePage: FC = () => {
@@ -22,13 +22,11 @@ export const HomePage: FC = () => {
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary-500 to-primary-700 dark:from-primary-600 dark:to-primary-800 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Explore ENS Domains
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Explore ENS Domains</h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-100">
             Discover domain information, profiles, and relationships
           </p>
-          
+
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-6">
             <div className="relative">
@@ -56,18 +54,13 @@ export const HomePage: FC = () => {
               </div>
             </div>
           </form>
-          
+
           {/* Network Graph Button */}
           <button
             onClick={() => router.push('/network')}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-600 font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-primary-50 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-300"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -93,12 +86,8 @@ export const HomePage: FC = () => {
                 onClick={() => router.push(`/domain/${domain}`)}
                 className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow text-left"
               >
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {domain}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  Click to explore
-                </p>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{domain}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Click to explore</p>
               </button>
             ))}
           </div>
@@ -116,7 +105,10 @@ export const HomePage: FC = () => {
             </div>
             <div>
               <h3 className="font-semibold mb-2">2. View Domain Information</h3>
-              <p>See comprehensive domain details including owner, registration, and resolver information</p>
+              <p>
+                See comprehensive domain details including owner, registration, and resolver
+                information
+              </p>
             </div>
             <div>
               <h3 className="font-semibold mb-2">3. Explore Profile</h3>
@@ -128,4 +120,3 @@ export const HomePage: FC = () => {
     </div>
   )
 }
-

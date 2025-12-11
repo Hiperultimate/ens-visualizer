@@ -6,8 +6,8 @@
  */
 
 const { Pool } = require('pg')
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 // Load .env file manually
 function loadEnv() {
@@ -43,10 +43,7 @@ if (!connectionString) {
 }
 
 // Mask sensitive parts of connection string for display
-const maskedUrl = connectionString.replace(
-  /:\/\/[^:]+:[^@]+@/,
-  '://***:***@'
-)
+const maskedUrl = connectionString.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@')
 
 console.log('🔍 Testing database connection...\n')
 console.log('📡 Connection String:', maskedUrl)
@@ -67,7 +64,9 @@ try {
   console.log('   postgresql://username:password@host:port/database')
   console.log('\n💡 For Supabase:')
   console.log('   postgresql://postgres:[YOUR-PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres')
-  console.log('\n⚠️  Note: If your password contains special characters, you need to URL-encode them:')
+  console.log(
+    '\n⚠️  Note: If your password contains special characters, you need to URL-encode them:',
+  )
   console.log('   @ → %40')
   console.log('   : → %3A')
   console.log('   / → %2F')
@@ -80,9 +79,7 @@ try {
 console.log('\n📡 Testing database connection...')
 const pool = new Pool({
   connectionString,
-  ssl: connectionString.includes('supabase.co')
-    ? { rejectUnauthorized: false }
-    : undefined,
+  ssl: connectionString.includes('supabase.co') ? { rejectUnauthorized: false } : undefined,
   connectionTimeoutMillis: 5000,
 })
 
@@ -107,9 +104,7 @@ pool
   .then((tablesResult) => {
     const existingTables = tablesResult.rows.map((row) => row.table_name)
     const requiredTables = ['users', 'nodes', 'connections']
-    const missingTables = requiredTables.filter(
-      (table) => !existingTables.includes(table)
-    )
+    const missingTables = requiredTables.filter((table) => !existingTables.includes(table))
 
     if (existingTables.length > 0) {
       console.log(`✅ Found ${existingTables.length} required table(s):`)
@@ -131,9 +126,7 @@ pool
     if (existingTables.includes('users')) {
       console.log('\n🔄 Testing query on users table...')
       return pool.query('SELECT COUNT(*) as count FROM users').then((userCount) => {
-        console.log(
-          `✅ Query successful! Found ${userCount.rows[0].count} user(s) in database`
-        )
+        console.log(`✅ Query successful! Found ${userCount.rows[0].count} user(s) in database`)
       })
     }
   })
@@ -141,7 +134,7 @@ pool
     return pool.end()
   })
   .then(() => {
-    console.log('\n' + '='.repeat(60))
+    console.log(`\n${'='.repeat(60)}`)
     console.log('✨ Database connection test completed successfully!')
     console.log('='.repeat(60))
     process.exit(0)
@@ -162,26 +155,17 @@ pool
       console.error('   2. Verify the hostname is correct')
       console.error('   3. For Supabase: Check if the project is active')
       console.error('   4. Firewall might be blocking the connection')
-    } else if (
-      error.message.includes('password authentication') ||
-      error.code === '28P01'
-    ) {
+    } else if (error.message.includes('password authentication') || error.code === '28P01') {
       console.error('\n💡 Authentication failed. Check:')
       console.error('   1. Password is correct')
       console.error('   2. Username is correct (should be "postgres" for Supabase)')
       console.error('   3. Special characters in password are URL-encoded')
-    } else if (
-      error.message.includes('timeout') ||
-      error.code === 'ETIMEDOUT'
-    ) {
+    } else if (error.message.includes('timeout') || error.code === 'ETIMEDOUT') {
       console.error('\n💡 Connection timeout. Check:')
       console.error('   1. Database server is running')
       console.error('   2. Firewall settings')
       console.error('   3. Network connectivity')
-    } else if (
-      error.message.includes('does not exist') ||
-      error.code === '3D000'
-    ) {
+    } else if (error.message.includes('does not exist') || error.code === '3D000') {
       console.error('\n💡 Database does not exist. Check:')
       console.error('   1. Database name is correct (usually "postgres")')
       console.error('   2. Database has been created')
@@ -194,7 +178,7 @@ pool
     console.error('\n📝 Check your DATABASE_URL format:')
     console.error('   postgresql://user:password@host:port/database')
     console.error(
-      '   For Supabase: postgresql://postgres:[PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres'
+      '   For Supabase: postgresql://postgres:[PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres',
     )
 
     pool.end().catch(() => {})

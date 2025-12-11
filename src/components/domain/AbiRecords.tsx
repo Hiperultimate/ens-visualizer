@@ -1,8 +1,8 @@
 'use client'
 
+import type { AbiRecord } from '@/types/ens'
 import type { FC } from 'react'
 import { useState } from 'react'
-import type { AbiRecord } from '@/types/ens'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -85,4 +85,3 @@ export const AbiRecords: FC<AbiRecordsProps> = ({ abiRecord }) => {
     </Card>
   )
 }
-

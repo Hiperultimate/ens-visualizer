@@ -1,5 +1,5 @@
-import type { FC } from 'react'
 import type { ContentHashInfo } from '@/types/ens'
+import type { FC } from 'react'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -8,7 +8,10 @@ interface ContentHashDisplayProps {
   domainName: string
 }
 
-export const ContentHashDisplay: FC<ContentHashDisplayProps> = ({ contentHashInfo, domainName }) => {
+export const ContentHashDisplay: FC<ContentHashDisplayProps> = ({
+  contentHashInfo,
+  domainName,
+}) => {
   if (!contentHashInfo || !contentHashInfo.decoded) {
     return (
       <Card title="Content Hash">
@@ -79,7 +82,9 @@ export const ContentHashDisplay: FC<ContentHashDisplayProps> = ({ contentHashInf
             Protocol Type
           </label>
           <div className="mt-1">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProtocolColor()}`}>
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getProtocolColor()}`}
+            >
               {getProtocolLabel()}
             </span>
           </div>
@@ -105,12 +110,7 @@ export const ContentHashDisplay: FC<ContentHashDisplayProps> = ({ contentHashInf
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 dark:bg-primary-500 rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
           >
             <span>Visit Website</span>
-            <svg
-              className="ml-2 w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -124,4 +124,3 @@ export const ContentHashDisplay: FC<ContentHashDisplayProps> = ({ contentHashInf
     </Card>
   )
 }
-

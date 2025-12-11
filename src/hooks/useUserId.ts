@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const USER_ID_STORAGE_KEY = 'ens_network_user_id'
 
@@ -12,8 +12,7 @@ export function useUserId() {
 
     if (storedUserId) {
       // Validate UUID format
-      const uuidRegex =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       if (uuidRegex.test(storedUserId)) {
         setUserId(storedUserId)
         setIsLoading(false)

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
-import { readFileSync } from 'fs'
-import { join } from 'path'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { query } from '@/lib/db'
+import { NextResponse } from 'next/server'
 
 // POST /api/migrate - Run database migration
 export async function POST() {
@@ -23,7 +23,7 @@ export async function POST() {
     // Execute each statement
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i]
-      if (statement.trim()) {
+      if (statement && statement.trim()) {
         try {
           await query(statement)
           executedStatements.push(`Statement ${i + 1}`)
@@ -31,7 +31,9 @@ export async function POST() {
           if (error instanceof Error && error.message.includes('already exists')) {
             skippedStatements.push(`Statement ${i + 1} (already exists)`)
           } else {
-            errors.push(`Statement ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+            errors.push(
+              `Statement ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            )
           }
         }
       }
@@ -52,9 +54,10 @@ export async function POST() {
 
     return NextResponse.json({
       success: errors.length === 0 && missingTables.length === 0,
-      message: errors.length === 0 && missingTables.length === 0
-        ? 'Migration completed successfully'
-        : 'Migration completed with warnings',
+      message:
+        errors.length === 0 && missingTables.length === 0
+          ? 'Migration completed successfully'
+          : 'Migration completed with warnings',
       executed: executedStatements.length,
       skipped: skippedStatements.length,
       errors: errors.length,
@@ -70,14 +73,14 @@ export async function POST() {
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    
+
     return NextResponse.json(
       {
         success: false,
         message: 'Migration failed',
         error: errorMessage,
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }

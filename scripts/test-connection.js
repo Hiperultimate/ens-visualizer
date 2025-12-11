@@ -1,5 +1,5 @@
 // Test database connection and validate connection string
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') })
+require('dotenv').config({ path: require('node:path').join(__dirname, '..', '.env') })
 const { Pool } = require('pg')
 
 const connectionString = process.env.DATABASE_URL
@@ -10,7 +10,7 @@ if (!connectionString) {
 }
 
 console.log('🔍 Analyzing connection string...')
-console.log('Format:', connectionString.substring(0, 30) + '...')
+console.log('Format:', `${connectionString.substring(0, 30)}...`)
 
 // Parse the connection string
 try {
@@ -27,7 +27,9 @@ try {
   console.log('   postgresql://username:password@host:port/database')
   console.log('\n💡 For Supabase:')
   console.log('   postgresql://postgres:[YOUR-PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres')
-  console.log('\n⚠️  Note: If your password contains special characters, you need to URL-encode them:')
+  console.log(
+    '\n⚠️  Note: If your password contains special characters, you need to URL-encode them:',
+  )
   console.log('   @ → %40')
   console.log('   : → %3A')
   console.log('   / → %2F')
@@ -40,9 +42,7 @@ try {
 console.log('\n📡 Testing database connection...')
 const pool = new Pool({
   connectionString,
-  ssl: connectionString.includes('supabase.co')
-    ? { rejectUnauthorized: false }
-    : undefined,
+  ssl: connectionString.includes('supabase.co') ? { rejectUnauthorized: false } : undefined,
   connectionTimeoutMillis: 5000,
 })
 
@@ -51,7 +51,10 @@ pool
   .then((result) => {
     console.log('✅ Connection successful!')
     console.log('   Current time:', result.rows[0].current_time)
-    console.log('   PostgreSQL version:', result.rows[0].version.split(' ')[0] + ' ' + result.rows[0].version.split(' ')[1])
+    console.log(
+      '   PostgreSQL version:',
+      `${result.rows[0].version.split(' ')[0]} ${result.rows[0].version.split(' ')[1]}`,
+    )
     return pool.end()
   })
   .then(() => {

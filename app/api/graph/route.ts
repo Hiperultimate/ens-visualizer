@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/db'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // GET /api/graph - Get complete graph data (nodes + connections) for a user
 export async function GET(request: NextRequest) {
@@ -8,10 +8,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId')
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'userId parameter is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'userId parameter is required' }, { status: 400 })
     }
 
     // Fetch nodes
@@ -23,7 +20,7 @@ export async function GET(request: NextRequest) {
       created_at: Date
     }>(
       'SELECT id, ens_name, position_x, position_y, created_at FROM nodes WHERE user_id = $1 ORDER BY created_at',
-      [userId]
+      [userId],
     )
 
     // Fetch connections
@@ -34,7 +31,7 @@ export async function GET(request: NextRequest) {
       created_at: Date
     }>(
       'SELECT id, source_node_id, target_node_id, created_at FROM connections WHERE user_id = $1 ORDER BY created_at',
-      [userId]
+      [userId],
     )
 
     return NextResponse.json({
@@ -43,9 +40,6 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error in GET /api/graph:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

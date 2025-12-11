@@ -1,5 +1,5 @@
-import type { FC } from 'react'
 import type { DomainDetails } from '@/types/ens'
+import type { FC } from 'react'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -53,9 +53,7 @@ export const DomainBasicInfo: FC<DomainBasicInfoProps> = ({ details }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Owner
-            </label>
+            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Owner</label>
             <div className="mt-1 flex items-center gap-2">
               {details.owner ? (
                 <>
@@ -170,4 +168,3 @@ export const DomainBasicInfo: FC<DomainBasicInfoProps> = ({ details }) => {
     </Card>
   )
 }
-

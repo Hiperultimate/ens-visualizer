@@ -1,9 +1,9 @@
 'use client'
 
-import type { FC } from 'react'
-import { useState, useEffect } from 'react'
-import { normalize } from 'viem/ens'
 import { publicClient } from '@/lib/ens-client'
+import type { FC } from 'react'
+import { useEffect, useState } from 'react'
+import { normalize } from 'viem/ens'
 
 interface AvatarDisplayProps {
   avatar?: string
@@ -11,11 +11,7 @@ interface AvatarDisplayProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
-export const AvatarDisplay: FC<AvatarDisplayProps> = ({
-  avatar,
-  name,
-  size = 'md',
-}) => {
+export const AvatarDisplay: FC<AvatarDisplayProps> = ({ avatar, name, size = 'md' }) => {
   const [imageError, setImageError] = useState(false)
   const [imageLoading, setImageLoading] = useState(true)
   const [currentUrl, setCurrentUrl] = useState<string | null>(null)
@@ -42,10 +38,9 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
     'https://dweb.link/ipfs/',
   ]
 
-
   const getAvatarUrl = (gatewayIdx = 0): string | null => {
     if (!avatar) return null
-    
+
     // Handle IPFS URLs
     if (avatar.startsWith('ipfs://')) {
       const cid = avatar.replace('ipfs://', '').replace(/^\/+/, '')
@@ -54,24 +49,24 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
       }
       return null
     }
-    
+
     // Handle IPNS URLs
     if (avatar.startsWith('ipns://')) {
       const ipns = avatar.replace('ipns://', '').replace(/^\/+/, '')
       return `https://cloudflare-ipfs.com/ipns/${ipns}`
     }
-    
+
     // Handle NFT avatars (eip155 format) - will be resolved asynchronously
     if (avatar.startsWith('eip155:')) {
       // Return null here, we'll handle it in useEffect
       return null
     }
-    
+
     // Handle HTTP/HTTPS URLs
     if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
       return avatar
     }
-    
+
     return null
   }
 
@@ -133,11 +128,16 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
 
   const handleImageError = () => {
     // Try next IPFS gateway if available and current URL is from IPFS
-    if (currentUrl && (currentUrl.includes('/ipfs/') || currentUrl.includes('ipfs://')) && gatewayIndex < ipfsGateways.length - 1) {
+    if (
+      currentUrl &&
+      (currentUrl.includes('/ipfs/') || currentUrl.includes('ipfs://')) &&
+      gatewayIndex < ipfsGateways.length - 1
+    ) {
       const nextIndex = gatewayIndex + 1
       setGatewayIndex(nextIndex)
       // Extract CID from current URL and try next gateway
-      const cidMatch = currentUrl.match(/ipfs\/([a-zA-Z0-9]+)/) || currentUrl.match(/ipfs:\/\/([a-zA-Z0-9]+)/)
+      const cidMatch =
+        currentUrl.match(/ipfs\/([a-zA-Z0-9]+)/) || currentUrl.match(/ipfs:\/\/([a-zA-Z0-9]+)/)
       if (cidMatch) {
         const cid = cidMatch[1]
         setCurrentUrl(`${ipfsGateways[nextIndex]}${cid}`)
@@ -167,7 +167,9 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
   const showImage = currentUrl && !imageError
 
   return (
-    <div className={`${sizes[size]} rounded-full flex items-center justify-center bg-gradient-to-br from-primary-400 to-primary-600 text-white font-semibold overflow-hidden flex-shrink-0 relative`}>
+    <div
+      className={`${sizes[size]} rounded-full flex items-center justify-center bg-gradient-to-br from-primary-400 to-primary-600 text-white font-semibold overflow-hidden flex-shrink-0 relative`}
+    >
       {showImage ? (
         <>
           {imageLoading && (
@@ -188,4 +190,3 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
     </div>
   )
 }
-

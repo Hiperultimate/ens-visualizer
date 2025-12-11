@@ -11,12 +11,9 @@ export const Card: FC<CardProps> = ({ children, title, className = '', ...props 
       {...props}
     >
       {title && (
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          {title}
-        </h3>
+        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">{title}</h3>
       )}
       {children}
     </div>
   )
 }
-

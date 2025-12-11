@@ -1,7 +1,7 @@
 // Simple migration script using Node.js
 const { Pool } = require('pg')
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 async function migrate() {
   const connectionString = process.env.DATABASE_URL
@@ -14,9 +14,7 @@ async function migrate() {
 
   const pool = new Pool({
     connectionString,
-    ssl: connectionString.includes('supabase.co')
-      ? { rejectUnauthorized: false }
-      : undefined,
+    ssl: connectionString.includes('supabase.co') ? { rejectUnauthorized: false } : undefined,
   })
 
   try {
@@ -34,13 +32,13 @@ async function migrate() {
     // Execute the entire schema as one transaction
     // This ensures all statements run in the correct order
     console.log('📝 Executing database schema...\n')
-    
+
     try {
       await pool.query(schema)
       console.log('✅ Schema executed successfully')
     } catch (error) {
       // If it's an "already exists" error, that's okay for CREATE IF NOT EXISTS
-      if (error.message && error.message.includes('already exists')) {
+      if (error.message?.includes('already exists')) {
         console.log('⚠️  Some objects already exist (this is okay)')
       } else {
         throw error
@@ -62,9 +60,7 @@ async function migrate() {
 
     console.log('📊 Created tables:', createdTables.join(', '))
 
-    const missingTables = expectedTables.filter(
-      (t) => !createdTables.includes(t)
-    )
+    const missingTables = expectedTables.filter((t) => !createdTables.includes(t))
 
     if (missingTables.length > 0) {
       console.error('❌ Missing tables:', missingTables.join(', '))
@@ -85,14 +81,10 @@ async function migrate() {
 
     // Test insert/select
     console.log('\n🧪 Testing database operations...')
-    const testUser = await pool.query(
-      'INSERT INTO users DEFAULT VALUES RETURNING id, created_at'
-    )
+    const testUser = await pool.query('INSERT INTO users DEFAULT VALUES RETURNING id, created_at')
     console.log('✅ Test user created:', testUser.rows[0].id)
 
-    await pool.query('DELETE FROM users WHERE id = $1', [
-      testUser.rows[0].id,
-    ])
+    await pool.query('DELETE FROM users WHERE id = $1', [testUser.rows[0].id])
     console.log('✅ Test user deleted')
 
     console.log('\n✨ Migration completed successfully!')
@@ -100,14 +92,14 @@ async function migrate() {
     process.exit(0)
   } catch (error) {
     console.error('\n❌ Migration failed:', error.message)
-    
-    if (error.message && error.message.includes('ENOTFOUND')) {
+
+    if (error.message?.includes('ENOTFOUND')) {
       console.error('\n💡 DNS resolution failed. This usually means:')
       console.error('   1. Your Supabase project might be paused')
       console.error('   2. Check your internet connection')
       console.error('   3. Verify the hostname in your connection string')
       console.error('\n   To fix: Go to Supabase dashboard and ensure your project is active')
-    } else if (error.message && error.message.includes('password authentication')) {
+    } else if (error.message?.includes('password authentication')) {
       console.error('\n💡 Authentication failed. Check your password in DATABASE_URL')
     } else if (error.stack) {
       console.error('\nStack trace:', error.stack)
@@ -119,7 +111,7 @@ async function migrate() {
 }
 
 // Load environment variables from .env file
-if (require('fs').existsSync(path.join(__dirname, '..', '.env'))) {
+if (require('node:fs').existsSync(path.join(__dirname, '..', '.env'))) {
   require('dotenv').config({ path: path.join(__dirname, '..', '.env') })
 }
 

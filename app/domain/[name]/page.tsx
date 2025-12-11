@@ -8,4 +8,3 @@ export default async function DomainPage({ params }: DomainPageProps) {
   const { name } = await params
   return <DomainView domainName={decodeURIComponent(name)} />
 }
-

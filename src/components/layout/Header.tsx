@@ -1,8 +1,8 @@
 'use client'
 
-import type { FC } from 'react'
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import type { FC } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Header: FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,13 +17,19 @@ export const Header: FC = () => {
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle('dark')
-    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+    localStorage.setItem(
+      'theme',
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+    )
   }
 
   // Initialize theme from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (
+      savedTheme === 'dark' ||
+      (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
       document.documentElement.classList.add('dark')
     }
   }, [])
@@ -109,4 +115,3 @@ export const Header: FC = () => {
     </header>
   )
 }
-

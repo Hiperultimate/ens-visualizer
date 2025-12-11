@@ -1,11 +1,11 @@
 'use client'
 
-import { useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { NetworkGraph, type NetworkGraphRef } from '@/components/network/NetworkGraph'
 import { ENSSearchInput } from '@/components/network/ENSSearchInput'
-import { useUserId } from '@/hooks/useUserId'
+import { NetworkGraph, type NetworkGraphRef } from '@/components/network/NetworkGraph'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { useUserId } from '@/hooks/useUserId'
+import { useRouter } from 'next/navigation'
+import { useRef } from 'react'
 
 export default function NetworkPage() {
   const router = useRouter()
@@ -19,7 +19,7 @@ export default function NetworkPage() {
   const handleENSSelect = (ensName: string) => {
     console.log('handleENSSelect called with:', ensName)
     console.log('graphRef.current:', graphRef.current)
-    
+
     if (graphRef.current) {
       console.log('Calling addNode on graphRef')
       graphRef.current.addNode(ensName).catch((error) => {
@@ -37,9 +37,7 @@ export default function NetworkPage() {
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
         <div className="text-center">
           <LoadingSpinner />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Initializing...
-          </p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Initializing...</p>
         </div>
       </div>
     )
@@ -59,9 +57,8 @@ export default function NetworkPage() {
             </label>
             <ENSSearchInput onSelect={handleENSSelect} />
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Search for a valid ENS name and add it to your network graph.
-              Click on nodes to view their profile, or drag to create
-              connections.
+              Search for a valid ENS name and add it to your network graph. Click on nodes to view
+              their profile, or drag to create connections.
             </p>
           </div>
         </div>
@@ -69,13 +66,7 @@ export default function NetworkPage() {
 
       {/* Network Graph */}
       <div className="flex-1 relative overflow-hidden" style={{ minHeight: 0 }}>
-        {userId && (
-          <NetworkGraph
-            ref={graphRef}
-            userId={userId}
-            onNodeClick={handleNodeClick}
-          />
-        )}
+        {userId && <NetworkGraph ref={graphRef} userId={userId} onNodeClick={handleNodeClick} />}
       </div>
     </div>
   )

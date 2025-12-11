@@ -13,7 +13,7 @@ export function getDbPool(): Pool {
 
     if (!connectionString) {
       throw new Error(
-        'DATABASE_URL environment variable is not set. Please add it to your .env file.'
+        'DATABASE_URL environment variable is not set. Please add it to your .env file.',
       )
     }
 
@@ -40,10 +40,7 @@ export function getDbPool(): Pool {
 }
 
 // Helper function to execute queries with proper error handling
-export async function query<T = unknown>(
-  text: string,
-  params?: unknown[]
-): Promise<T[]> {
+export async function query<T = unknown>(text: string, params?: unknown[]): Promise<T[]> {
   const pool = getDbPool()
   try {
     const result = await pool.query(text, params)
@@ -55,10 +52,7 @@ export async function query<T = unknown>(
 }
 
 // Helper function to execute a single row query
-export async function queryOne<T = unknown>(
-  text: string,
-  params?: unknown[]
-): Promise<T | null> {
+export async function queryOne<T = unknown>(text: string, params?: unknown[]): Promise<T | null> {
   const rows = await query<T>(text, params)
   return rows[0] || null
 }

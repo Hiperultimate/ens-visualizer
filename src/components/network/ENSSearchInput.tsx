@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { normalize } from 'viem/ens'
-import { getOwner } from '@ensdomains/ensjs/public'
-import { publicClient } from '@/lib/ens-client'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { publicClient } from '@/lib/ens-client'
+import { getOwner } from '@ensdomains/ensjs/public'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { normalize } from 'viem/ens'
 
 interface ENSSearchInputProps {
   onSelect: (ensName: string) => void
@@ -26,7 +26,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
       const owner = await getOwner(publicClient, { name: normalizedName })
       // If owner exists, the domain exists
       return !!owner?.owner
-    } catch (error) {
+    } catch (_error) {
       return false
     }
   }, [])
@@ -45,10 +45,10 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
       try {
         // Normalize the name first
         const normalizedName = normalize(name)
-        
+
         // Just check if domain exists (much faster than fetching all details)
         const exists = await checkENSExists(normalizedName)
-        
+
         // Only update state if the search query still matches what we're validating
         // This prevents race conditions where user types while validation is running
         if (currentQueryRef.current.trim() === name.trim()) {
@@ -64,11 +64,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
         // Only update state if the search query still matches
         if (currentQueryRef.current.trim() === name.trim()) {
           setIsValid(false)
-          setError(
-            error instanceof Error
-              ? error.message
-              : 'Invalid ENS name or domain not found'
-          )
+          setError(error instanceof Error ? error.message : 'Invalid ENS name or domain not found')
         }
       } finally {
         // Only clear validating if this validation is still relevant
@@ -77,7 +73,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
         }
       }
     },
-    [checkENSExists]
+    [checkENSExists],
   )
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +81,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
     // Update input value immediately - never block typing
     setSearchQuery(value)
     currentQueryRef.current = value // Keep ref in sync
-    
+
     // Clear existing timeout
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current)
@@ -107,7 +103,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
     debounceTimeoutRef.current = setTimeout(() => {
       // Check if the value is still the same (user stopped typing)
       const valueToValidate = currentQueryRef.current.trim()
-      
+
       if (valueToValidate && valueToValidate === value.trim()) {
         setIsValidating(true)
         validateENSName(valueToValidate).catch((error) => {
@@ -137,7 +133,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
         setIsValid(null)
         setError(null)
         setIsValidating(false)
-      } catch (error) {
+      } catch (_error) {
         setError('Invalid ENS name format')
         setIsValid(false)
       }
@@ -186,9 +182,7 @@ export function ENSSearchInput({ onSelect, disabled }: ENSSearchInputProps) {
           )}
         </div>
       </div>
-      {error && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
       {isValid === true && !error && (
         <p className="mt-1 text-sm text-green-600 dark:text-green-400">
           Valid ENS name - Click "Add" or press Enter

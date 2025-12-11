@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getDbPool, queryOne } from '@/lib/db'
+import { queryOne } from '@/lib/db'
+import { type NextRequest, NextResponse } from 'next/server'
 
 // GET /api/users - Get or create a user by UUID
 export async function GET(request: NextRequest) {
@@ -8,26 +8,19 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId')
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'userId parameter is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'userId parameter is required' }, { status: 400 })
     }
 
     // Validate UUID format
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     if (!uuidRegex.test(userId)) {
-      return NextResponse.json(
-        { error: 'Invalid UUID format' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid UUID format' }, { status: 400 })
     }
 
     // Check if user exists
     const user = await queryOne<{ id: string; created_at: Date }>(
       'SELECT id, created_at FROM users WHERE id = $1',
-      [userId]
+      [userId],
     )
 
     if (user) {
@@ -37,14 +30,11 @@ export async function GET(request: NextRequest) {
     // User doesn't exist, create new one
     const newUser = await queryOne<{ id: string; created_at: Date }>(
       'INSERT INTO users (id) VALUES ($1) RETURNING id, created_at',
-      [userId]
+      [userId],
     )
 
     if (!newUser) {
-      return NextResponse.json(
-        { error: 'Failed to create user' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -53,10 +43,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Error in GET /api/users:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -64,14 +51,11 @@ export async function GET(request: NextRequest) {
 export async function POST() {
   try {
     const newUser = await queryOne<{ id: string; created_at: Date }>(
-      'INSERT INTO users DEFAULT VALUES RETURNING id, created_at'
+      'INSERT INTO users DEFAULT VALUES RETURNING id, created_at',
     )
 
     if (!newUser) {
-      return NextResponse.json(
-        { error: 'Failed to create user' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -80,9 +64,6 @@ export async function POST() {
     })
   } catch (error) {
     console.error('Error in POST /api/users:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

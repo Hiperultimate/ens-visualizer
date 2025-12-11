@@ -1,5 +1,5 @@
-import type { FC } from 'react'
 import type { DomainDetails } from '@/types/ens'
+import type { FC } from 'react'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -37,7 +37,10 @@ export const OwnershipRoles: FC<OwnershipRolesProps> = ({ details }) => {
     <Card title="Ownership Roles">
       <div className="space-y-4">
         {roles.map((role) => (
-          <div key={role.label} className="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-4 last:pb-0">
+          <div
+            key={role.label}
+            className="border-b border-gray-200 dark:border-gray-700 last:border-0 pb-4 last:pb-0"
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -45,9 +48,7 @@ export const OwnershipRoles: FC<OwnershipRolesProps> = ({ details }) => {
                     {role.label}
                   </h4>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  {role.description}
-                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{role.description}</p>
                 {role.address ? (
                   <div className="flex items-center gap-2">
                     <a
@@ -71,4 +72,3 @@ export const OwnershipRoles: FC<OwnershipRolesProps> = ({ details }) => {
     </Card>
   )
 }
-

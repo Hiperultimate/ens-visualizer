@@ -68,4 +68,3 @@ export interface DomainProfile {
   avatar?: string
   socialLinks: SocialLinks
 }
-
