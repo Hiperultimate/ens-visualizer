@@ -3,6 +3,7 @@ import { useDomainDetails } from '@/hooks/useDomainDetails'
 import { ENSService } from '@/services/ens.service'
 import { LoadingSpinner } from '../ui/LoadingSpinner'
 import { ErrorMessage } from '../ui/ErrorMessage'
+import { Tabs } from '../ui/Tabs'
 import { DomainBasicInfo } from './DomainBasicInfo'
 import { ResolverInfo } from './ResolverInfo'
 import { DomainProfile } from './DomainProfile'
@@ -52,6 +53,44 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
 
   const profile = ENSService.extractProfile(details)
 
+  const tabs = [
+    {
+      id: 'profile',
+      label: 'Profile',
+      content: <DomainProfile profile={profile} domainName={details.beautifiedName} />,
+    },
+    {
+      id: 'basic',
+      label: 'Basic Information',
+      content: <DomainBasicInfo details={details} />,
+    },
+    {
+      id: 'ownership',
+      label: 'Ownership Roles',
+      content: <OwnershipRoles details={details} />,
+    },
+    {
+      id: 'resolver',
+      label: 'Resolver Details',
+      content: <ResolverInfo details={details} />,
+    },
+    {
+      id: 'content-hash',
+      label: 'Content Hash',
+      content: <ContentHashDisplay contentHashInfo={details.contentHashInfo} domainName={details.beautifiedName} />,
+    },
+    {
+      id: 'abi',
+      label: 'ABI Records',
+      content: <AbiRecords abiRecord={details.abiRecord} />,
+    },
+    {
+      id: 'subnames',
+      label: 'Subnames',
+      content: <SubnamesList subnames={details.subnames} parentDomain={details.beautifiedName} />,
+    },
+  ]
+
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="mb-6">
@@ -63,28 +102,7 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
         </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Feature 1.3: User Profile Display */}
-        <DomainProfile profile={profile} domainName={details.beautifiedName} />
-
-        {/* Feature 1.1: Basic Domain Information */}
-        <DomainBasicInfo details={details} />
-
-        {/* Ownership Roles */}
-        <OwnershipRoles details={details} />
-
-        {/* Feature 1.2: Resolver Details Panel */}
-        <ResolverInfo details={details} />
-
-        {/* Content Hash Display */}
-        <ContentHashDisplay contentHashInfo={details.contentHashInfo} domainName={details.beautifiedName} />
-
-        {/* ABI Records */}
-        <AbiRecords abiRecord={details.abiRecord} />
-
-        {/* Subnames List */}
-        <SubnamesList subnames={details.subnames} parentDomain={details.beautifiedName} />
-      </div>
+      <Tabs tabs={tabs} defaultTab="profile" />
     </div>
   )
 }
