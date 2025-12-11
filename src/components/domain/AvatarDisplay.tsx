@@ -1,5 +1,7 @@
 import type { FC } from 'react'
 import { useState, useEffect } from 'react'
+import { normalize } from 'viem/ens'
+import { publicClient } from '@/lib/ens-client'
 
 interface AvatarDisplayProps {
   avatar?: string
@@ -38,6 +40,7 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
     'https://dweb.link/ipfs/',
   ]
 
+
   const getAvatarUrl = (gatewayIdx = 0): string | null => {
     if (!avatar) return null
     
@@ -56,10 +59,9 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
       return `https://cloudflare-ipfs.com/ipns/${ipns}`
     }
     
-    // Handle NFT avatars (eip155 format) - eip155:1/erc721:0x.../123
+    // Handle NFT avatars (eip155 format) - will be resolved asynchronously
     if (avatar.startsWith('eip155:')) {
-      // For POC, we'll try to extract and use a placeholder
-      // Full NFT avatar resolution would require additional service
+      // Return null here, we'll handle it in useEffect
       return null
     }
     
@@ -72,40 +74,87 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
   }
 
   useEffect(() => {
-    if (avatar) {
+    let isMounted = true
+
+    const loadAvatar = async () => {
       setImageError(false)
       setImageLoading(true)
-      const url = getAvatarUrl(0)
-      setCurrentUrl(url)
-      setGatewayIndex(0)
-      // Debug logging (remove in production)
-      if (import.meta.env.DEV) {
-        console.log('Avatar value:', avatar)
-        console.log('Generated URL:', url)
+
+      try {
+        // Use viem's getEnsAvatar which handles all avatar types (NFT, IPFS, HTTP)
+        const normalizedName = normalize(name)
+        const avatarUrl = await publicClient.getEnsAvatar({
+          name: normalizedName,
+        })
+
+        if (isMounted) {
+          if (avatarUrl) {
+            setCurrentUrl(avatarUrl)
+            setGatewayIndex(0)
+            if (import.meta.env.DEV) {
+              console.log('Resolved avatar URL:', avatarUrl)
+            }
+          } else {
+            // Fallback to avatar text record if getEnsAvatar returns null
+            const url = getAvatarUrl(0)
+            setCurrentUrl(url)
+            setGatewayIndex(0)
+            if (!url) {
+              setImageError(true)
+              setImageLoading(false)
+            }
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          if (import.meta.env.DEV) {
+            console.error('Error loading avatar:', error)
+          }
+          // Fallback to avatar text record
+          const url = getAvatarUrl(0)
+          setCurrentUrl(url)
+          setGatewayIndex(0)
+          if (!url) {
+            setImageError(true)
+            setImageLoading(false)
+          }
+        }
       }
-      // If no URL could be generated, mark as error immediately
-      if (!url) {
-        setImageError(true)
-        setImageLoading(false)
-      }
-    } else {
-      setCurrentUrl(null)
-      setImageLoading(false)
-      setImageError(false)
     }
-  }, [avatar])
+
+    loadAvatar()
+
+    return () => {
+      isMounted = false
+    }
+  }, [name, avatar])
 
   const handleImageError = () => {
-    // Try next IPFS gateway if available
-    if (avatar?.startsWith('ipfs://') && gatewayIndex < ipfsGateways.length - 1) {
+    // Try next IPFS gateway if available and current URL is from IPFS
+    if (currentUrl && (currentUrl.includes('/ipfs/') || currentUrl.includes('ipfs://')) && gatewayIndex < ipfsGateways.length - 1) {
       const nextIndex = gatewayIndex + 1
       setGatewayIndex(nextIndex)
-      setCurrentUrl(getAvatarUrl(nextIndex))
-      setImageLoading(true)
-    } else {
-      setImageError(true)
-      setImageLoading(false)
+      // Extract CID from current URL and try next gateway
+      const cidMatch = currentUrl.match(/ipfs\/([a-zA-Z0-9]+)/) || currentUrl.match(/ipfs:\/\/([a-zA-Z0-9]+)/)
+      if (cidMatch) {
+        const cid = cidMatch[1]
+        setCurrentUrl(`${ipfsGateways[nextIndex]}${cid}`)
+        setImageLoading(true)
+        return
+      }
     }
+    // Fallback to avatar text record if available
+    if (avatar) {
+      const url = getAvatarUrl(0)
+      if (url && url !== currentUrl) {
+        setCurrentUrl(url)
+        setGatewayIndex(0)
+        setImageLoading(true)
+        return
+      }
+    }
+    setImageError(true)
+    setImageLoading(false)
   }
 
   const handleImageLoad = () => {
@@ -129,7 +178,6 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
             onError={handleImageError}
             onLoad={handleImageLoad}
             style={{ display: imageLoading ? 'none' : 'block' }}
-            crossOrigin="anonymous"
           />
         </>
       ) : (
