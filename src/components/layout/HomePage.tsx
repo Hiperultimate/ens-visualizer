@@ -30,7 +30,7 @@ export const HomePage: FC = () => {
           </p>
           
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-6">
             <div className="relative">
               <input
                 type="text"
@@ -56,6 +56,27 @@ export const HomePage: FC = () => {
               </div>
             </div>
           </form>
+          
+          {/* Network Graph Button */}
+          <button
+            onClick={() => router.push('/network')}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-600 font-semibold rounded-lg shadow-lg hover:shadow-xl hover:bg-primary-50 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary-300"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+              />
+            </svg>
+            Explore Network Graph
+          </button>
         </div>
       </div>
 
