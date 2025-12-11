@@ -17,11 +17,7 @@ export default function NetworkPage() {
   }
 
   const handleENSSelect = (ensName: string) => {
-    console.log('handleENSSelect called with:', ensName)
-    console.log('graphRef.current:', graphRef.current)
-
     if (graphRef.current) {
-      console.log('Calling addNode on graphRef')
       graphRef.current.addNode(ensName).catch((error) => {
         console.error('Error in addNode:', error)
         alert('Failed to add node. Please check the console for details.')

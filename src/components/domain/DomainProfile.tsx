@@ -50,17 +50,6 @@ const SocialIcon: FC<{ platform: string; url: string }> = ({ platform, url }) =>
 }
 
 export const DomainProfile: FC<DomainProfileProps> = ({ profile, domainName }) => {
-  // Debug logging in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('DomainProfile received:', {
-      profile,
-      domainName,
-      hasAvatar: !!profile.avatar,
-      hasWebsite: !!profile.website,
-      socialLinks: profile.socialLinks,
-    })
-  }
-
   const socialLinks: Array<{ platform: string; url: string; value: string }> = []
 
   if (profile.socialLinks.twitter) {

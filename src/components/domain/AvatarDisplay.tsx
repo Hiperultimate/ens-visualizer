@@ -88,9 +88,6 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({ avatar, name, size = 'md
           if (avatarUrl) {
             setCurrentUrl(avatarUrl)
             setGatewayIndex(0)
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Resolved avatar URL:', avatarUrl)
-            }
           } else {
             // Fallback to avatar text record if getEnsAvatar returns null
             const url = getAvatarUrl(0)
@@ -104,9 +101,6 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({ avatar, name, size = 'md
         }
       } catch (error) {
         if (isMounted) {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Error loading avatar:', error)
-          }
           // Fallback to avatar text record
           const url = getAvatarUrl(0)
           setCurrentUrl(url)

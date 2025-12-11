@@ -12,7 +12,7 @@ pnpm install
 pnpm dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:3000`
 
 ## ✨ Features
 
@@ -27,12 +27,12 @@ The application will be available at `http://localhost:5173`
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18 + TypeScript 5
-- **Build Tool**: Vite
+- **Frontend**: Next.js 16 + React 18 + TypeScript 5
+- **Database**: PostgreSQL (Supabase compatible)
 - **ENS Integration**: @ensdomains/ensjs v4 (using `getDetails()`)
-- **Blockchain**: viem
+- **Blockchain**: viem + wagmi
 - **State Management**: TanStack Query + React hooks
-- **Graph Visualization**: React Flow
+- **Graph Visualization**: @xyflow/react (React Flow)
 - **Styling**: Tailwind CSS
 - **Linting**: BiomeJS
 - **Testing**: Vitest
@@ -46,6 +46,8 @@ All documentation is located in the [`docs/`](./docs) folder:
 - **[Requirements](./docs/requirements.md)** - Full feature specifications
 - **[Setup Guide](./docs/SETUP.md)** - Detailed setup instructions
 - **[Project Summary](./docs/PROJECT_SUMMARY.md)** - Overview and features
+- **[Network Graph Feature](./docs/NETWORK_GRAPH_FEATURE.md)** - Network graph implementation details
+- **[Database Setup](./docs/DATABASE_README.md)** - Database schema and setup guide
 
 ## 🎯 Key Commands
 
@@ -65,29 +67,54 @@ pnpm type-check       # TypeScript validation
 pnpm test             # Run tests
 pnpm test:ui          # Run tests with UI
 pnpm test:coverage    # Generate coverage report
+
+# Database
+pnpm db:migrate       # Run database migration (Node.js)
+pnpm db:migrate:ts    # Run database migration (TypeScript)
+pnpm db:check         # Check if database tables exist
+pnpm db:status        # Check database status
+pnpm db:test          # Test database connection
+pnpm db:reset         # Reset database (re-run migration)
 ```
 
 ## 🏗️ Project Structure
 
 ```
 ensnetwork/
-├── docs/                    # 📚 All documentation
-│   ├── ARCHITECTURE.md      # Technical architecture
-│   ├── requirements.md      # Feature specifications
-│   ├── SETUP.md            # Setup guide
-│   ├── QUICK_START.md      # Quick start guide
-│   └── PROJECT_SUMMARY.md  # Project overview
-├── src/                    # Source code (to be created)
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   │   ├── connections/   # Connection CRUD operations
+│   │   ├── graph/         # Graph data endpoint
+│   │   ├── migrate/       # Migration endpoint
+│   │   ├── nodes/         # Node CRUD operations
+│   │   ├── test-db/       # Database test endpoint
+│   │   └── users/         # User management
+│   ├── domain/            # Domain detail pages
+│   ├── network/           # Network graph page
+│   └── layout.tsx         # Root layout
+├── src/                    # Source code
 │   ├── components/        # React components
-│   ├── hooks/            # Custom hooks
-│   ├── lib/              # Utilities
-│   ├── services/         # ENS services
-│   └── types/            # TypeScript types
-├── public/                # Static assets
-├── biome.json            # Linting config
-├── vite.config.ts        # Build config
-├── tsconfig.json         # TypeScript config
-└── package.json          # Dependencies
+│   │   ├── domain/        # Domain-related components
+│   │   ├── layout/        # Layout components
+│   │   ├── network/       # Network graph components
+│   │   ├── providers/     # Context providers
+│   │   └── ui/            # UI components
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utilities and database
+│   ├── services/          # ENS services
+│   └── types/             # TypeScript types
+├── database/              # Database schema
+│   └── schema.sql         # PostgreSQL schema
+├── docs/                  # 📚 All documentation
+├── scripts/               # Utility scripts
+│   ├── migrate.js         # Migration script (Node.js)
+│   ├── migrate.ts         # Migration script (TypeScript)
+│   └── check-tables.js    # Table verification
+├── test/                  # Test files
+├── biome.json             # Linting config
+├── next.config.mjs        # Next.js config
+├── tsconfig.json          # TypeScript config
+└── package.json           # Dependencies
 ```
 
 ## 🎨 Features Overview
@@ -114,12 +141,14 @@ ensnetwork/
 
 ## 🚀 Architecture Highlights
 
-### Frontend-Only (No Backend Required)
+### Architecture
 
+- ✅ **Next.js App Router**: Modern React framework with server components
 - ✅ **Single `getDetails()` Call**: 10x faster than multiple RPC calls
 - ✅ **Direct Blockchain Access**: Via viem + ensjs
+- ✅ **PostgreSQL Database**: Stores network graph data (nodes & connections)
 - ✅ **Smart Caching**: TanStack Query for optimal performance
-- ✅ **Static Hosting**: Deploy to Vercel/Netlify for free
+- ✅ **API Routes**: RESTful API for graph CRUD operations
 - ✅ **Scalable**: Handles 10,000+ concurrent users
 
 ### State Management
@@ -139,15 +168,46 @@ ensnetwork/
 
 ## 🔧 Environment Setup
 
-Create a `.env` file:
+Create a `.env` file in the root directory:
 
 ```bash
-# RPC Provider (get free API key from alchemy.com)
-VITE_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY
+# Database Connection (PostgreSQL)
+# For Supabase: postgresql://postgres:[YOUR-PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres
+DATABASE_URL=postgresql://user:password@localhost:5432/ensnetwork
 
-# ENS Subgraph (public endpoint)
-VITE_ENS_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/ensdomains/ens
+# Optional: RPC Provider (for enhanced ENS queries)
+# Get free API key from alchemy.com or infura.io
+NEXT_PUBLIC_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_API_KEY
 ```
+
+### Database Setup
+
+1. **Set up PostgreSQL database** (local or Supabase)
+   - Create a new PostgreSQL database
+   - Copy the connection string to `DATABASE_URL` in `.env`
+
+2. **Run database migration**
+   ```bash
+   # Using Node.js script
+   pnpm db:migrate
+   
+   # Or using TypeScript script
+   pnpm db:migrate:ts
+   ```
+
+3. **Verify database setup**
+   ```bash
+   # Check if tables exist
+   pnpm db:check
+   
+   # Test database connection
+   pnpm db:test
+   ```
+
+The migration will create the following tables:
+- `users` - User UUIDs for graph ownership
+- `nodes` - ENS domain nodes in the graph
+- `connections` - Relationships between nodes
 
 ## 📖 Getting Started
 
@@ -163,9 +223,19 @@ VITE_ENS_SUBGRAPH_URL=https://api.thegraph.com/subgraphs/name/ensdomains/ens
 
 3. **Configure Environment**
    - Copy `.env.example` to `.env`
+   - Add your `DATABASE_URL` (required for network graph feature)
    - Add your RPC provider API key (optional, public endpoints work)
 
-4. **Start Development**
+4. **Set up Database**
+   ```bash
+   # Run database migration
+   pnpm db:migrate
+   
+   # Verify setup
+   pnpm db:check
+   ```
+
+5. **Start Development**
    ```bash
    pnpm dev
    ```

@@ -316,7 +316,6 @@ export const NetworkGraph = forwardRef<NetworkGraphRef, NetworkGraphProps>(
           return label && typeof label === 'string' && label.toLowerCase() === ensName.toLowerCase()
         })
         if (existingNode) {
-          console.log('Node already exists:', ensName)
           // Optionally, you could focus on the existing node
           return
         }
@@ -330,7 +329,6 @@ export const NetworkGraph = forwardRef<NetworkGraphRef, NetworkGraphProps>(
 
         try {
           setIsSaving(true)
-          console.log('Adding node:', { userId, ensName, positionX, positionY })
 
           const response = await fetch('/api/nodes', {
             method: 'POST',
@@ -345,7 +343,6 @@ export const NetworkGraph = forwardRef<NetworkGraphRef, NetworkGraphProps>(
 
           if (response.ok) {
             const data = await response.json()
-            console.log('Node added successfully:', data)
 
             const newNode: Node = {
               id: data.node.id,
