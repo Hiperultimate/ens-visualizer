@@ -1,8 +1,8 @@
 'use client'
 
-import type { FC } from 'react'
-import { useRouter } from 'next/navigation'
 import type { Subname } from '@/types/ens'
+import { useRouter } from 'next/navigation'
+import type { FC } from 'react'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
 
@@ -121,4 +121,3 @@ export const SubnamesList: FC<SubnamesListProps> = ({ subnames }) => {
     </Card>
   )
 }
-

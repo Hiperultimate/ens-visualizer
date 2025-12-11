@@ -149,7 +149,6 @@
       "enabled": true,
       "indentWidth": 2,
       "lineWidth": 100
-
     },
     "parser": {
       "allowComments": true,
@@ -179,4 +178,3 @@
     }
   ]
 }
-

@@ -1,18 +1,18 @@
 'use client'
 
-import type { FC } from 'react'
 import { useDomainDetails } from '@/hooks/useDomainDetails'
 import { ENSService } from '@/services/ens.service'
-import { LoadingSpinner } from '../ui/LoadingSpinner'
+import type { FC } from 'react'
 import { ErrorMessage } from '../ui/ErrorMessage'
+import { LoadingSpinner } from '../ui/LoadingSpinner'
 import { Tabs } from '../ui/Tabs'
-import { DomainBasicInfo } from './DomainBasicInfo'
-import { ResolverInfo } from './ResolverInfo'
-import { DomainProfile } from './DomainProfile'
-import { ContentHashDisplay } from './ContentHashDisplay'
 import { AbiRecords } from './AbiRecords'
-import { SubnamesList } from './SubnamesList'
+import { ContentHashDisplay } from './ContentHashDisplay'
+import { DomainBasicInfo } from './DomainBasicInfo'
+import { DomainProfile } from './DomainProfile'
 import { OwnershipRoles } from './OwnershipRoles'
+import { ResolverInfo } from './ResolverInfo'
+import { SubnamesList } from './SubnamesList'
 
 interface DomainViewProps {
   domainName: string
@@ -26,9 +26,7 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading domain information...
-          </p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading domain information...</p>
         </div>
       </div>
     )
@@ -79,7 +77,12 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
     {
       id: 'content-hash',
       label: 'Content Hash',
-      content: <ContentHashDisplay contentHashInfo={details.contentHashInfo} domainName={details.beautifiedName} />,
+      content: (
+        <ContentHashDisplay
+          contentHashInfo={details.contentHashInfo}
+          domainName={details.beautifiedName}
+        />
+      ),
     },
     {
       id: 'abi',
@@ -99,13 +102,10 @@ export const DomainView: FC<DomainViewProps> = ({ domainName }) => {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
           {details.beautifiedName}
         </h1>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          ENS Domain Information
-        </p>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">ENS Domain Information</p>
       </div>
 
       <Tabs tabs={tabs} defaultTab="profile" />
     </div>
   )
 }
-

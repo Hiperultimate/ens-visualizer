@@ -45,10 +45,7 @@ export const Tabs: FC<TabsProps> = ({ tabs, defaultTab }) => {
       </div>
 
       {/* Tab Content */}
-      <div className="mt-6">
-        {activeTabContent}
-      </div>
+      <div className="mt-6">{activeTabContent}</div>
     </div>
   )
 }
-

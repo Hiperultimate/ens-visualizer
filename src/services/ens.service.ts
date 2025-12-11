@@ -1,15 +1,22 @@
-import { getRecords, getOwner, getExpiry, getResolver, getWrapperData, getAbiRecord } from '@ensdomains/ensjs/public'
+import { publicClient } from '@/lib/ens-client'
+import type { AbiRecord, ContentHashInfo, DomainDetails, DomainProfile, Subname } from '@/types/ens'
+import {
+  getAbiRecord,
+  getExpiry,
+  getOwner,
+  getRecords,
+  getResolver,
+  getWrapperData,
+} from '@ensdomains/ensjs/public'
 import { getSubnames } from '@ensdomains/ensjs/subgraph'
 import { normalize } from 'viem/ens'
-import { publicClient } from '@/lib/ens-client'
-import type { DomainDetails, DomainProfile, ContentHashInfo, AbiRecord, Subname } from '@/types/ens'
 
 export class ENSService {
   static async getDomainDetails(name: string): Promise<DomainDetails> {
     try {
       // Normalize the domain name
       const normalizedName = normalize(name)
-      
+
       // Fetch all data in parallel for optimal performance
       // Note: getRecords needs specific text/coin keys to return them
       // We fetch common text records - expand this list as needed
@@ -62,20 +69,18 @@ export class ENSService {
         }),
         getAbiRecord(publicClient, { name: normalizedName }).catch(() => {
           // ABI records are rare, so we silently fail
-          if (process.env.NODE_ENV === 'development') {
-            console.log('No ABI record found for', normalizedName)
-          }
           return null
         }),
       ])
 
       // Extract resolver information
       const resolverAddress = resolver || records?.resolverAddress || null
-      const resolverType = resolverAddress === '0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63'
-        ? 'Public Resolver'
-        : resolverAddress
-          ? 'Custom Resolver'
-          : null
+      const resolverType =
+        resolverAddress === '0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63'
+          ? 'Public Resolver'
+          : resolverAddress
+            ? 'Custom Resolver'
+            : null
 
       // Convert records arrays to objects for easier access
       const texts: Record<string, string> = {}
@@ -83,15 +88,6 @@ export class ENSService {
         for (const text of records.texts) {
           texts[text.key] = text.value
         }
-      }
-      
-      // Debug logging in development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Fetched records for', normalizedName, ':', {
-          texts,
-          recordsCount: records?.texts?.length || 0,
-          resolver: resolver || records?.resolverAddress,
-        })
       }
 
       const coins: Record<string, string> = {}
@@ -115,13 +111,17 @@ export class ENSService {
       let abiRecordData: AbiRecord | null = null
       if (abiRecord) {
         try {
-          const parsedAbi = typeof abiRecord.decoded === 'string' 
-            ? JSON.parse(abiRecord.decoded) 
-            : abiRecord.decoded
-          
+          const parsedAbi =
+            typeof abiRecord.decoded === 'string'
+              ? JSON.parse(abiRecord.decoded)
+              : abiRecord.decoded
+
           abiRecordData = {
             contentType: abiRecord.contentType || 0,
-            decoded: typeof abiRecord.decoded === 'string' ? abiRecord.decoded : JSON.stringify(abiRecord.decoded),
+            decoded:
+              typeof abiRecord.decoded === 'string'
+                ? abiRecord.decoded
+                : JSON.stringify(abiRecord.decoded),
             abi: parsedAbi,
           }
         } catch (error) {
@@ -129,7 +129,10 @@ export class ENSService {
           // Still include the raw decoded value
           abiRecordData = {
             contentType: abiRecord.contentType || 0,
-            decoded: typeof abiRecord.decoded === 'string' ? abiRecord.decoded : JSON.stringify(abiRecord.decoded),
+            decoded:
+              typeof abiRecord.decoded === 'string'
+                ? abiRecord.decoded
+                : JSON.stringify(abiRecord.decoded),
             abi: null,
           }
         }
@@ -137,7 +140,7 @@ export class ENSService {
 
       // Extract expiry information
       const expiryDate = expiry?.expiry ? Number(expiry.expiry.value) : null
-      
+
       // Calculate registration date from expiry date
       // For .eth 2LD domains, we estimate registration date from expiry
       // Note: This is an approximation - domains can be renewed, so the actual
@@ -147,14 +150,14 @@ export class ENSService {
       if (expiryDate) {
         // Check if this is a .eth 2LD domain
         const isEth2LD = normalizedName.split('.').length === 2 && normalizedName.endsWith('.eth')
-        
+
         if (isEth2LD) {
           // Standard .eth registration period is 1 year (31536000 seconds)
           // Calculate registration date: expiry - 1 year
           // This works for initial registrations, but may be inaccurate for renewed domains
           const oneYearInSeconds = 31536000
           registrationDate = expiryDate - oneYearInSeconds
-          
+
           // Ensure we don't get a negative or unreasonable date
           // Minimum reasonable date: January 1, 2017 (ENS launch)
           const ensLaunchDate = 1483228800 // Jan 1, 2017
@@ -163,10 +166,11 @@ export class ENSService {
           }
         }
       }
-      
-      const gracePeriodEndDate = expiry?.expiry && expiry.gracePeriod
-        ? Number(expiry.expiry.value) + expiry.gracePeriod
-        : null
+
+      const gracePeriodEndDate =
+        expiry?.expiry && expiry.gracePeriod
+          ? Number(expiry.expiry.value) + expiry.gracePeriod
+          : null
 
       // Extract owner information
       const ownerAddress = owner?.owner || null
@@ -185,7 +189,7 @@ export class ENSService {
           allowExpired: false,
           allowDeleted: false,
         })
-        
+
         subnames = subnamesData.map((subname) => ({
           id: subname.id,
           name: subname.name,
@@ -194,15 +198,14 @@ export class ENSService {
           owner: subname.owner,
           registrant: subname.registrant || null,
           createdAt: subname.createdAt ? Number(subname.createdAt.value) : null,
-          registrationDate: subname.registrationDate ? Number(subname.registrationDate.value) : null,
+          registrationDate: subname.registrationDate
+            ? Number(subname.registrationDate.value)
+            : null,
           expiryDate: subname.expiryDate ? Number(subname.expiryDate.value) : null,
           resolvedAddress: subname.resolvedAddress || null,
         }))
       } catch (error) {
         // Subgraph may not be available or may fail, silently continue
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Could not fetch subnames for', normalizedName, ':', error)
-        }
       }
 
       return {
@@ -225,21 +228,25 @@ export class ENSService {
         abiRecord: abiRecordData,
         subnames,
         isWrapped,
-        fuses: wrapperData?.fuses ? {
-          parent: wrapperData.fuses.parent as unknown as Record<string, boolean>,
-          child: wrapperData.fuses.child as unknown as Record<string, boolean>,
-        } : undefined,
+        fuses: wrapperData?.fuses
+          ? {
+              parent: wrapperData.fuses.parent as unknown as Record<string, boolean>,
+              child: wrapperData.fuses.child as unknown as Record<string, boolean>,
+            }
+          : undefined,
         tokenId: undefined, // Not available in getWrapperData return type
       }
     } catch (error) {
       console.error('Error fetching domain details:', error)
-      throw new Error(`Failed to fetch domain details: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to fetch domain details: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   static extractProfile(details: DomainDetails): DomainProfile {
     return {
-      displayName: details.texts?.['name'] || details.beautifiedName,
+      displayName: details.texts?.name || details.beautifiedName,
       bio: details.texts?.description,
       email: details.texts?.email,
       phone: details.texts?.phone,

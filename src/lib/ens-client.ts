@@ -1,6 +1,6 @@
-import { createPublicClient, fallback, http } from 'viem'
-import { mainnet } from 'viem/chains'
 import { addEnsContracts } from '@ensdomains/ensjs'
+import { http, createPublicClient, fallback } from 'viem'
+import { mainnet } from 'viem/chains'
 
 // Multiple RPC endpoints with fallback
 // Order: Custom RPC (if provided) -> Public endpoints (fallback chain)
@@ -15,10 +15,12 @@ const rpcUrls = [
 
 // Create fallback transport - tries each RPC in order
 const transport = fallback(
-  rpcUrls.map((url) => http(url, { 
-    timeout: 10000, // 10 second timeout
-    retryCount: 2, // Retry twice before moving to next
-  }))
+  rpcUrls.map((url) =>
+    http(url, {
+      timeout: 10000, // 10 second timeout
+      retryCount: 2, // Retry twice before moving to next
+    }),
+  ),
 )
 
 export const publicClient = createPublicClient({
@@ -28,4 +30,3 @@ export const publicClient = createPublicClient({
     multicall: true, // Enable multicall for batch requests
   },
 })
-

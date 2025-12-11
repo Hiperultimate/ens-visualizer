@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { ENSService } from '@/services/ens.service'
 import type { DomainDetails } from '@/types/ens'
+import { useQuery } from '@tanstack/react-query'
 
 export const useDomainDetails = (name: string | null) => {
   return useQuery<DomainDetails>({
@@ -14,4 +14,3 @@ export const useDomainDetails = (name: string | null) => {
     retry: 2,
   })
 }
-

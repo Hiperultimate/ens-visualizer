@@ -1,8 +1,8 @@
 'use client'
 
-import type { FC } from 'react'
-import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import type { FC } from 'react'
+import { useEffect, useState } from 'react'
 
 export const Header: FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,13 +17,19 @@ export const Header: FC = () => {
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle('dark')
-    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+    localStorage.setItem(
+      'theme',
+      document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+    )
   }
 
   // Initialize theme from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (
+      savedTheme === 'dark' ||
+      (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ) {
       document.documentElement.classList.add('dark')
     }
   }, [])
@@ -32,14 +38,28 @@ export const Header: FC = () => {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo and Navigation */}
+          <div className="flex items-center gap-6">
             <button
               onClick={() => router.push('/')}
               className="text-xl font-bold text-primary-600 dark:text-primary-400"
             >
               ENS Network
             </button>
+            <nav className="hidden md:flex items-center gap-4">
+              <button
+                onClick={() => router.push('/')}
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                Home
+              </button>
+              <button
+                onClick={() => router.push('/network')}
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                Network Graph
+              </button>
+            </nav>
           </div>
 
           {/* Search Bar */}
@@ -95,4 +115,3 @@ export const Header: FC = () => {
     </header>
   )
 }
-
