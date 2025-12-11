@@ -45,7 +45,7 @@ const SocialIcon: FC<{ platform: string; url: string }> = ({ platform, url }) =>
 
 export const DomainProfile: FC<DomainProfileProps> = ({ profile, domainName }) => {
   // Debug logging in development
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV === 'development') {
     console.log('DomainProfile received:', {
       profile,
       domainName,

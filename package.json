@@ -2,11 +2,10 @@
   "name": "ens-network",
   "version": "0.1.0",
   "description": "ENS Network Application - Visualize and explore ENS domain relationships",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -19,9 +18,9 @@
     "@ensdomains/ensjs": "^4.2.0",
     "@tanstack/react-query": "^5.60.5",
     "@xyflow/react": "^12.3.5",
+    "next": "^16.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
     "viem": "^2.21.54",
     "wagmi": "^2.12.29"
   },
@@ -31,12 +30,10 @@
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.7.2",
-    "vite": "^6.0.1",
     "vitest": "^2.1.5"
   },
   "engines": {

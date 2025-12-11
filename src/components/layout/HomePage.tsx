@@ -1,15 +1,17 @@
+'use client'
+
 import type { FC } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export const HomePage: FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/domain/${searchQuery.trim()}`)
+      router.push(`/domain/${searchQuery.trim()}`)
     }
   }
 
@@ -67,7 +69,7 @@ export const HomePage: FC = () => {
             {exampleDomains.map((domain) => (
               <button
                 key={domain}
-                onClick={() => navigate(`/domain/${domain}`)}
+                onClick={() => router.push(`/domain/${domain}`)}
                 className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow text-left"
               >
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">

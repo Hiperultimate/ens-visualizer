@@ -1,3 +1,5 @@
+'use client'
+
 import type { FC } from 'react'
 import { useDomainDetails } from '@/hooks/useDomainDetails'
 import { ENSService } from '@/services/ens.service'

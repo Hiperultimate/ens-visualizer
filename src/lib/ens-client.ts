@@ -5,7 +5,7 @@ import { addEnsContracts } from '@ensdomains/ensjs'
 // Multiple RPC endpoints with fallback
 // Order: Custom RPC (if provided) -> Public endpoints (fallback chain)
 const rpcUrls = [
-  import.meta.env.VITE_RPC_URL, // Custom RPC from env (optional)
+  process.env.NEXT_PUBLIC_RPC_URL, // Custom RPC from env (optional)
   'https://eth.llamarpc.com', // LlamaRPC (reliable public endpoint)
   'https://rpc.ankr.com/eth', // Ankr (reliable public endpoint)
   'https://ethereum.publicnode.com', // PublicNode (reliable)

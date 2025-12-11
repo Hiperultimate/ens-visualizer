@@ -1,3 +1,5 @@
+'use client'
+
 import type { FC } from 'react'
 import { useState, useEffect } from 'react'
 import { normalize } from 'viem/ens'
@@ -91,7 +93,7 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
           if (avatarUrl) {
             setCurrentUrl(avatarUrl)
             setGatewayIndex(0)
-            if (import.meta.env.DEV) {
+            if (process.env.NODE_ENV === 'development') {
               console.log('Resolved avatar URL:', avatarUrl)
             }
           } else {
@@ -107,7 +109,7 @@ export const AvatarDisplay: FC<AvatarDisplayProps> = ({
         }
       } catch (error) {
         if (isMounted) {
-          if (import.meta.env.DEV) {
+          if (process.env.NODE_ENV === 'development') {
             console.error('Error loading avatar:', error)
           }
           // Fallback to avatar text record

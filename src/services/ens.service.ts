@@ -62,7 +62,7 @@ export class ENSService {
         }),
         getAbiRecord(publicClient, { name: normalizedName }).catch(() => {
           // ABI records are rare, so we silently fail
-          if (import.meta.env.DEV) {
+          if (process.env.NODE_ENV === 'development') {
             console.log('No ABI record found for', normalizedName)
           }
           return null
@@ -86,7 +86,7 @@ export class ENSService {
       }
       
       // Debug logging in development
-      if (import.meta.env.DEV) {
+      if (process.env.NODE_ENV === 'development') {
         console.log('Fetched records for', normalizedName, ':', {
           texts,
           recordsCount: records?.texts?.length || 0,
@@ -174,7 +174,7 @@ export class ENSService {
         }))
       } catch (error) {
         // Subgraph may not be available or may fail, silently continue
-        if (import.meta.env.DEV) {
+        if (process.env.NODE_ENV === 'development') {
           console.log('Could not fetch subnames for', normalizedName, ':', error)
         }
       }

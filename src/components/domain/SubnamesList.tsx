@@ -1,5 +1,7 @@
+'use client'
+
 import type { FC } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import type { Subname } from '@/types/ens'
 import { Card } from '../ui/Card'
 import { CopyButton } from '../ui/CopyButton'
@@ -10,7 +12,7 @@ interface SubnamesListProps {
 }
 
 export const SubnamesList: FC<SubnamesListProps> = ({ subnames }) => {
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const formatDate = (timestamp: number | null) => {
     if (!timestamp) return 'N/A'
@@ -28,7 +30,7 @@ export const SubnamesList: FC<SubnamesListProps> = ({ subnames }) => {
 
   const handleSubnameClick = (subname: string | null) => {
     if (subname) {
-      navigate(`/domain/${subname}`)
+      router.push(`/domain/${subname}`)
     }
   }
 

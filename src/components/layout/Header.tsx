@@ -1,15 +1,17 @@
+'use client'
+
 import type { FC } from 'react'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 
 export const Header: FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
-  const navigate = useNavigate()
+  const router = useRouter()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/domain/${searchQuery.trim()}`)
+      router.push(`/domain/${searchQuery.trim()}`)
     }
   }
 
@@ -33,7 +35,7 @@ export const Header: FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               className="text-xl font-bold text-primary-600 dark:text-primary-400"
             >
               ENS Network
